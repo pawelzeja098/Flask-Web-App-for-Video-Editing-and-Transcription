@@ -20,14 +20,19 @@ socketio = SocketIO(app)
 play = False
 
 
-
 def capture_frames():
     """Capture frames from the default camera and emit them to clients."""
     # cap = cv2.VideoCapture(0)
-    global cap,play
+    global cap,play,speed
     # cap = get_frames_from_film(frame = 100)
     video_path = "E:/Programowanie/MOV2024.mp4"
     cap = cv2.VideoCapture(video_path)
+
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  
+    fps = cap.get(cv2.CAP_PROP_FPS)  
+    video_length = total_frames / fps  
+    eventlet.sleep(0.0001)
+    socketio.emit("set_max_time", {"max_time": int(video_length)})
 
     if not cap.isOpened():
         print("Error: Could not open camera.")
@@ -40,8 +45,10 @@ def capture_frames():
 
         ret, frame = cap.read()
         if not ret:
-            print("Error: Failed to capture frame.")
-            break
+            # print("Error: Failed to capture frame.")
+            play = False
+            continue
+            
 
         # Encode the frame as JPEG
         _, buffer = cv2.imencode('.jpg', frame)
@@ -50,7 +57,7 @@ def capture_frames():
         # Emit the encoded frame to all connected clients
         socketio.emit('frame', jpg_as_text)
 
-        eventlet.sleep(0.1)
+        eventlet.sleep(1/fps)
 
     cap.release()
     
@@ -61,7 +68,7 @@ def handle_start():
     print(" Command: START")
     global play
     play = True
-    socketio.emit("status", {"message": "Streaming started"})  # Wysyłamy status do klienta
+    socketio.emit("status", {"message": "Streaming started"})  
 
 @socketio.on("stop")
 def handle_stop():
@@ -71,12 +78,15 @@ def handle_stop():
     socketio.emit("status", {"message": "Streaming stopped"})
 
 @socketio.on("rewind")
-def handle_rewind():
-    print("Otrzymano komendę: REWIND")
+def handle_rewind(data):
+    print("Command: REWIND")
     global cap
-    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    time = int(data['time'])
+    cap.set(cv2.CAP_PROP_POS_MSEC, time * 1000)
     
-    socketio.emit("status", {"message": "Rewinding video"})
+    socketio.emit("status", {"message": f"Rewinding video to {time}s"})
+
+
 
 # def get_frames_from_film(frame):
 #     video_path = "E:/Programowanie/MOV2024.mp4"

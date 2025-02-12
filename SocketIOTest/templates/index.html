@@ -102,6 +102,11 @@
         .status-disconnected {
             background-color: #FF5722;
             color: white;
+
+        }
+        #rewind-slider {
+            width: 100%; 
+            max-width: 500px; 
         }
     </style>
 </head>
@@ -112,11 +117,17 @@
         <div id="video-container">
             <img id="video" src="" alt="Live Camera Feed">
         </div>
-        <h2>Kontrola</h2>
+        <h2>Controll panel</h2>
         <div>
             <button onclick="sendCommand('start')">Start</button>
             <button onclick="sendCommand('stop')">Stop</button>
-            <button onclick="sendCommand('rewind')">Przewiń</button>
+            <!--<button onclick="sendCommand('rewind')">Rewind</button>-->
+            <!--<button onclick="sendCommand('faster')">Stop</button>
+    <button onclick="sendCommand('slower')">Rewind</button>-->
+            <h3>Rewind to:</h3>
+            <input type="range" id="rewind-slider" min="0" max="800" value="0" step="1">
+            <span id="current-time">0s</span>
+            <button onclick="sendRewind()">Rewind</button>
         </div>
 
         <div id="status">
@@ -157,9 +168,26 @@
 
         }
         function sendCommand(command) {
-            console.log("Wysłano komendę:", command);
+            console.log("Command:", command);
             socket.emit(command);
         }
+        function sendRewind() {
+
+            const rewindTime = document.getElementById('rewind-slider').value;
+            console.log("Rewind to:", rewindTime);
+            socket.emit('rewind', { time: rewindTime });
+        }
+
+        socket.on('set_max_time', (data) => {
+            const maxTime = data.max_time;
+            document.getElementById('rewind-slider').max = maxTime;
+            console.log("Max time set to:", maxTime);
+        });
+
+        document.getElementById('rewind-slider').addEventListener('input', function () {
+            const time = this.value;
+            document.getElementById('current-time').textContent = time + "s";
+        });
 
     </script>
 </body>
