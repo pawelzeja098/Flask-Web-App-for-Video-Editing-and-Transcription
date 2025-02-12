@@ -112,6 +112,12 @@
         <div id="video-container">
             <img id="video" src="" alt="Live Camera Feed">
         </div>
+        <h2>Kontrola</h2>
+        <div>
+            <button onclick="sendCommand('start')">Start</button>
+            <button onclick="sendCommand('stop')">Stop</button>
+            <button onclick="sendCommand('rewind')">Przewiń</button>
+        </div>
 
         <div id="status">
             <span id="status-text" class="status-text status-disconnected">Connecting...</span>
@@ -148,7 +154,13 @@
                 statusText.classList.add('status-disconnected');
                 statusText.textContent = 'Disconnected';
             }
+
         }
+        function sendCommand(command) {
+            console.log("Wysłano komendę:", command);
+            socket.emit(command);
+        }
+
     </script>
 </body>
 </html>

@@ -42,3 +42,5 @@ def about():
 def home():
     """Render the index.html template on the root URL."""
     return render_template('index.html')
+
+

@@ -17,7 +17,7 @@
     <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
     <Name>SocketIOTest</Name>
     <RootNamespace>SocketIOTest</RootNamespace>
-    <InterpreterId>CondaEnv|CondaEnv|VoiceTranscript</InterpreterId>
+    <InterpreterId>CondaEnv|CondaEnv|SocketIOTest</InterpreterId>
     <WebBrowserPort>5000</WebBrowserPort>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -71,6 +71,7 @@
     <Content Include="SocketIOTest\templates\layout.html" />
   </ItemGroup>
   <ItemGroup>
+    <InterpreterReference Include="CondaEnv|CondaEnv|SocketIOTest" />
     <InterpreterReference Include="CondaEnv|CondaEnv|VoiceTranscript" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
