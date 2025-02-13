@@ -3,10 +3,90 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ title }} - My Flask Application</title>
+    <title>{{ title }} - Live Camera Feed</title>
     <link rel="stylesheet" type="text/css" href="/static/content/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="/static/content/site.css" />
     <script src="/static/scripts/modernizr-2.6.2.js"></script>
+
+
+
+    
+    
+   
+    <!-- Socket.IO library for real-time communication -->
+    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        #video-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #video {
+            max-width: 100%;
+            height: auto;
+            transition: transform 0.3s ease-out;
+        }
+
+        #status {
+            margin-top: 20px;
+            color: #555;
+            font-size: 1.2rem;
+        }
+
+        .status-text {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-connected {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .status-disconnected {
+            background-color: #FF5722;
+            color: white;
+        }
+
+        #rewind-slider {
+            width: 100%;
+            max-width: 500px;
+        }
+    </style>
 </head>
 
 <body>

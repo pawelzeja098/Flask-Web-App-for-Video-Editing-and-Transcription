@@ -29,88 +29,8 @@
         <p><a class="btn btn-default" href="http://azure.microsoft.com">Learn more &raquo;</a></p>
     </div>
 </div>-->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Camera Feed</title>
-    <!-- Socket.IO library for real-time communication -->
-    <script src="https://cdn.socket.io/4.3.2/socket.io.min.js"></script>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
 
-        .container {
-            max-width: 800px;
-            background-color: #fff;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-        }
 
-        h1 {
-            color: #333;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-
-        #video-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-            position: relative;
-            overflow: hidden;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        #video {
-            max-width: 100%;
-            height: auto;
-            transition: transform 0.3s ease-out;
-        }
-
-        #status {
-            margin-top: 20px;
-            color: #555;
-            font-size: 1.2rem;
-        }
-
-        .status-text {
-            display: inline-block;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .status-connected {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .status-disconnected {
-            background-color: #FF5722;
-            color: white;
-
-        }
-        #rewind-slider {
-            width: 100%; 
-            max-width: 500px; 
-        }
-    </style>
-</head>
-<body>
     <div class="container">
         <h1>Live Camera Feed</h1>
 
@@ -135,61 +55,77 @@
         </div>
     </div>
 
-    <script>
-        const socket = io();
+    
 
-        socket.on('connect', () => {
-            console.log('Connected to server');
-            setStatus('Connected');
-        });
 
-        socket.on('frame', (jpg_as_text) => {
-            const img = document.getElementById('video');
-            img.src = 'data:image/jpeg;base64,' + jpg_as_text;
-        });
+{% endblock %}
+{% block scripts %}
+<script defer>
 
-        socket.on('disconnect', () => {
-            console.log('Disconnected from server');
-            setStatus('Disconnected');
-        });
+    const socket = io();
 
-        function setStatus(status) {
-            const statusText = document.getElementById('status-text');
-            statusText.textContent = status;
-            if (status === 'Connected') {
-                statusText.classList.remove('status-disconnected');
-                statusText.classList.add('status-connected');
-                statusText.textContent = 'Connected';
-            } else {
-                statusText.classList.remove('status-connected');
-                statusText.classList.add('status-disconnected');
-                statusText.textContent = 'Disconnected';
-            }
+    socket.on('connect', () => {
+        console.log('Connected to server');
+        setStatus('Connected');
+    });
 
-        }
-        function sendCommand(command) {
-            console.log("Command:", command);
-            socket.emit(command);
-        }
-        function sendRewind() {
+    socket.on('frame', (jpg_as_text) => {
+        const img = document.getElementById('video');
+        img.src = 'data:image/jpeg;base64,' + jpg_as_text;
+    });
 
-            const rewindTime = document.getElementById('rewind-slider').value;
-            console.log("Rewind to:", rewindTime);
-            socket.emit('rewind', { time: rewindTime });
+    socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+        setStatus('Disconnected');
+    });
+
+    function setStatus(status) {
+        const statusText = document.getElementById('status-text');
+        statusText.textContent = status;
+        if (status === 'Connected') {
+            statusText.classList.remove('status-disconnected');
+            statusText.classList.add('status-connected');
+            statusText.textContent = 'Connected';
+        } else {
+            statusText.classList.remove('status-connected');
+            statusText.classList.add('status-disconnected');
+            statusText.textContent = 'Disconnected';
         }
 
-        socket.on('set_max_time', (data) => {
-            const maxTime = data.max_time;
-            document.getElementById('rewind-slider').max = maxTime;
-            console.log("Max time set to:", maxTime);
-        });
+    }
+    function sendCommand(command) {
+        console.log("Command:", command);
+        socket.emit(command);
+    }
+    function sendRewind() {
 
-        document.getElementById('rewind-slider').addEventListener('input', function () {
-            const time = this.value;
-            document.getElementById('current-time').textContent = time + "s";
-        });
+        const rewindTime = document.getElementById('rewind-slider').value;
+        console.log("Rewind to:", rewindTime);
+        socket.emit('rewind', { time: rewindTime });
+    }
+    function sendRewind() {
 
-    </script>
-</body>
-</html>
+        const rewindTime = document.getElementById('rewind-slider').value;
+        console.log("Rewind to:", rewindTime);
+        socket.emit('rewind', { time: rewindTime });
+    }
+    socket.on('set_max_time', (data) => {
+        const maxTime = data.max_time;
+        document.getElementById('rewind-slider').max = maxTime;
+        console.log("Max time set to:", maxTime);
+    });
+    socket.on('curr_film_time', (data) => {
+        const curr_time = data.curr_time;
+        document.getElementById('rewind-slider').value = curr_time;
+        document.getElementById('current-time').textContent = curr_time + "s"
+
+    });
+    document.getElementById('rewind-slider').addEventListener('input', function () {
+        const time = this.value;
+        document.getElementById('current-time').textContent = time + "s";
+        socket.emit('rewind', { time: time })
+        eventlet.sleep(1)
+    });
+
+</script>
 {% endblock %}
