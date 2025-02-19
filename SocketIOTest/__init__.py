@@ -15,6 +15,10 @@ import eventlet
 import csv
 from flask import Flask, render_template
 from flask_socketio import SocketIO
+import freetype
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+
 
 # Initialize Flask application and Socket.IO
 app = Flask(__name__)
@@ -52,12 +56,15 @@ class Subtitles:
         Searching for subtitles index after rewinding film
         """
         i = 0
-
+        if time < self.text_times[0][0]:
+            self.time_idx = i
+            return
         for i in range(len(self.text_times) - 1):
+            
             if time > self.text_times[i][0]:
                 if time < self.text_times[i + 1][0]:  
                     self.time_idx = i
-                    
+                    return
             i+=1
 
 class VideoControler:
@@ -85,27 +92,6 @@ video_length = total_frames / fps
 
 app.video_controller = VideoControler(cap,subtitles,video_length,fps)        
 
-# def capture_subtitles():
-#     """
-#     Get subtitles text and times from csv file
-#     """
-
-#     global text_times
-#     subtitles = []
-#     text_times = []
-#     with open('E:/Programowanie/transcription.csv','r',encoding='utf-8') as csv_file:
-#         csvreader = csv.DictReader(csv_file)
-#         for row in csvreader:
-#             subtitles.append({
-#                 "text" : row["Sentence"],
-#                 "start" : float(row["Start"]),
-#                 "stop" : float(row["Stop"])
-#                 })
-#             text_times.append((float(row["Start"]),float(row["Stop"])))
-            
-#     return subtitles, text_times
-    
-    
 
 
 
@@ -113,40 +99,39 @@ def put_text_on_image(img,text):
     """
     Putting text on frame
     """
+    # ft2 = cv2.freetype.createFreeType2()
+    # font = "arial.ttf"
 
-    font = cv2.FONT_HERSHEY_SIMPLEX
+    # # org
+    # img_height, img_width, _ = img.shape
+    # org = (50, img_height - 50)
 
-    # org
-    img_height, img_width, _ = img.shape
-    org = (50, img_height - 50)
-
-    # fontScale
-    fontScale = 1
+    # # fontScale
+    # fontScale = 1
  
-    # Blue color in BGR
-    color = (255, 0, 0)
+    # # Blue color in BGR
+    # color = (255, 0, 0)
 
-    # Line thickness of 2 px
-    thickness = 2
+    # # Line thickness of 2 px
+    # thickness = 2
 
-    img = cv2.putText(img,text, org, font, fontScale, 
-                 color, thickness, cv2.LINE_AA, False)
+    # img = cv2.putText(img,ft2, org, font, fontScale, 
+    #              color, thickness, cv2.LINE_AA, False)
 
-    return img
+    # return img
+    font_path="arial.ttf"
+    img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))  
+    draw = ImageDraw.Draw(img_pil)
 
-# def search_for_sub_idx(time):
-#     """
-#     Searching for subtitles index after rewinding film
-#     """
-#     i = 0
-#     global cap, time_idx
-#     for i in range(len(text_times) - 1):
-#         if time > text_times[i][0]:
-#             if time < text_times[i + 1][0]:  
-#                 time_idx = i
-#                 return time_idx
+    font = ImageFont.truetype(font_path, 40)  
+    position = (50, img.shape[0] - 50)  
+    color = (255, 0, 0)  
 
-#         i+=1
+    draw.text(position, text, font=font, fill=color)  
+
+    return cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+
+
 
 def capture_frames():
     """Capture frames from the default camera and emit them to clients."""
