@@ -46,20 +46,15 @@
             <h3>Rewind to:</h3>
             <input type="range" id="rewind-slider" min="0" max="800" value="0" step="1">
             <span id="current-time">0s</span>
-            <button onclick="select_trim_range()">Cut</button>
+            <button type="button" class="btn btn-warning" onclick="select_trim_range()">Cut</button>
 
             <h3>Cut</h3>
             <div id="slider"></div>
             <div id="range"></div>
-            <!--<div class="mb-0">
-        <label class="form-label">Example</label>
-        <div id="kt_slider_basic"></div>
 
-        <div class="pt-5">
-            <div class="fw-semibold mb-2">Min: <span id="kt_slider_basic_min"></span></div>
-            <div class="fw-semibold mb-2">Max: <span id="kt_slider_basic_max"></span></div>
-        </div>
-    </div>-->
+            <div id="subtiles_trimmed" style="display: none;">
+                <p id="subtitles_trimmed" class="lh-1"></p>
+            </div>
         </div>
 
         <div id="status">
@@ -221,6 +216,19 @@
         document.getElementById('current-time').textContent = time + "s";
         socket.emit('rewind', { time: time })
         
+    });
+
+    socket.on('trimmed_subtitles', (data) => {
+        const trimmed_sub = data.subtitles;
+        const subtitlesDiv = document.getElementById('subtiles_trimmed');
+        const subtitlesParagraph = document.getElementById('subtitles_trimmed');
+
+        if (trimmed_sub !== '') {
+            subtitlesParagraph.textContent = trimmed_sub;
+            subtitlesDiv.style.display = 'block';
+        } else {
+            subtitlesDiv.style.display = 'none';
+        }
     });
 
 </script>

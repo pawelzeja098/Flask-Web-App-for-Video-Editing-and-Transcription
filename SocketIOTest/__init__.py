@@ -66,6 +66,43 @@ class Subtitles:
                     return
             i+=1
 
+    def get_trimmed_subtitles(self,start,stop):
+        i = 0
+        trimmed_subtitles = []
+        ts =''
+        start_idx = 0
+        stop_idx = 0
+        
+
+        if start < self.text_times[0][0]:
+            start_idx = 0
+        
+        for i in range(len(self.text_times) - 1):
+            
+            if start > self.text_times[i][0]:
+                if start < self.text_times[i + 1][0]:  
+                    start_idx = i
+                    
+            i+=1
+        i = 0
+        for i in range(len(self.text_times) - 1):
+            
+            if stop > self.text_times[i][0]:
+                if stop < self.text_times[i + 1][0]:  
+                    stop_idx = i
+                    
+            i+=1
+
+        for i in range(start_idx,stop_idx + 1):
+
+            trimmed_subtitles.append(self.text[i]['text'])
+            ts += self.text[i]['text'] + ' '
+        return ts
+
+        
+
+
+
 
 class VideoControler:
     def __init__(self,cap,subtitles,video_length,fps) -> None:
@@ -242,7 +279,9 @@ def handle_trim(data):
     stop_value = int(float(data['valueUp']))
     app.video_controller.trim_start_value = start_value
     app.video_controller.trim_stop_value = stop_value
-    print(start_value)
+    trimmed_sub = app.video_controller.subtitles.get_trimmed_subtitles(start_value,stop_value)
+    socketio.emit("trimmed_subtitles", {"subtitles": trimmed_sub})
+    
 
 
 
