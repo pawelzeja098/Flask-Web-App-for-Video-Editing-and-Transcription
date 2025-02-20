@@ -39,15 +39,27 @@
         </div>
         <h2>Controll panel</h2>
         <div>
-            <button onclick="sendCommand('start')">Start</button>
-            <button onclick="sendCommand('stop')">Stop</button>
+            <button type="button" class="btn btn-success" onclick="sendCommand('start')">Start</button>
+            <button type="button" class="btn btn-danger" onclick="sendCommand('stop')">Stop</button>
             <!--<button onclick="sendCommand('rewind')">Rewind</button>-->
-            <!--<button onclick="sendCommand('faster')">Stop</button>
-    <button onclick="sendCommand('slower')">Rewind</button>-->
+
             <h3>Rewind to:</h3>
             <input type="range" id="rewind-slider" min="0" max="800" value="0" step="1">
             <span id="current-time">0s</span>
-            <button onclick="sendRewind()">Rewind</button>
+            <button onclick="select_trim_range()">Cut</button>
+
+            <h3>Cut</h3>
+            <div id="slider"></div>
+            <div id="range"></div>
+            <!--<div class="mb-0">
+        <label class="form-label">Example</label>
+        <div id="kt_slider_basic"></div>
+
+        <div class="pt-5">
+            <div class="fw-semibold mb-2">Min: <span id="kt_slider_basic_min"></span></div>
+            <div class="fw-semibold mb-2">Max: <span id="kt_slider_basic_max"></span></div>
+        </div>
+    </div>-->
         </div>
 
         <div id="status">
@@ -61,7 +73,51 @@
 {% endblock %}
 {% block scripts %}
 <script defer>
+    
 
+    //range.style.height = '400px';
+    //range.style.margin = '0 auto 30px';
+
+    //var valuesDivs = [
+    //    document.getElementById('range-value-1'),
+    //    document.getElementById('range-value-2'),
+    //    document.getElementById('range-value-3'),
+    //    document.getElementById('range-value-4')
+    //];
+
+    //var diffDivs = [
+    //    document.getElementById('range-diff-1'),
+    //    document.getElementById('range-diff-2'),
+    //    document.getElementById('range-diff-3')
+    //];
+
+    //range.noUiSlider.on('update', function (values, handle) {
+    //    valuesDivs[handle].innerHTML = values[handle];
+    //    diffDivs[0].innerHTML = values[1] - values[0];
+    //    diffDivs[1].innerHTML = values[2] - values[1];
+    //    diffDivs[2].innerHTML = values[3] - values[2];
+    //});
+    
+    //var slider = document.querySelector("#kt_slider_basic");
+    //var valueMin = document.querySelector("#kt_slider_basic_min");
+    //var valueMax = document.querySelector("#kt_slider_basic_max");
+
+    //noUiSlider.create(slider, {
+    //    start: [20, 80],
+    //    connect: true,
+    //    range: {
+    //        "min": 0,
+    //        "max": 100
+    //    }
+    //});
+
+    //slider.noUiSlider.on("update", function (values, handle) {
+    //    if (handle) {
+    //        valueMax.innerHTML = values[handle];
+    //    } else {
+    //        valueMin.innerHTML = values[handle];
+    //    }
+    //});
     const socket = io();
 
     socket.on('connect', () => {
@@ -97,22 +153,62 @@
         console.log("Command:", command);
         socket.emit(command);
     }
-    function sendRewind() {
+    //function sendRewind() {
 
-        const rewindTime = document.getElementById('rewind-slider').value;
-        console.log("Rewind to:", rewindTime);
-        socket.emit('rewind', { time: rewindTime });
-    }
-    function sendRewind() {
+    //    const rewindTime = document.getElementById('rewind-slider').value;
+    //    console.log("Rewind to:", rewindTime);
+    //    socket.emit('rewind', { time: rewindTime });
+    //}
+    //function sendRewind() {
 
-        const rewindTime = document.getElementById('rewind-slider').value;
-        console.log("Rewind to:", rewindTime);
-        socket.emit('rewind', { time: rewindTime });
+    //    const rewindTime = document.getElementById('rewind-slider').value;
+    //    console.log("Rewind to:", rewindTime);
+    //    socket.emit('rewind', { time: rewindTime });
+    /*}*/
+
+    function cut_slider(maxTime) {
+        var slider = document.getElementById('slider');
+        var range = document.getElementById('range');
+        noUiSlider.create(slider, {
+            start: [20, 80],
+            connect: true,
+            tooltips: true,
+            pips: {
+                mode: 'steps',
+                stepped: true,
+                density: 4
+            },
+            range: {
+                'min': 0,
+                'max': maxTime
+
+            }
+
+        });
+        
     }
+
+    function select_trim_range(){
+        const handleup = document.querySelector('.noUi-handle-upper');
+        const handlelow = document.querySelector('.noUi-handle-lower')
+
+
+        if (handleup && handlelow) {
+            const valueUp = handleup.getAttribute('aria-valuenow');
+            const valueLow = handlelow.getAttribute('aria-valuenow');
+
+            socket.emit('trim_video', { valueUp: valueUp,valueLow : valueLow})
+        }
+    }
+
+    
+
     socket.on('set_max_time', (data) => {
         const maxTime = data.max_time;
         document.getElementById('rewind-slider').max = maxTime;
         console.log("Max time set to:", maxTime);
+
+        cut_slider(maxTime);
     });
     socket.on('curr_film_time', (data) => {
         const curr_time = data.curr_time;

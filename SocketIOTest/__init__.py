@@ -15,7 +15,6 @@ import eventlet
 import csv
 from flask import Flask, render_template
 from flask_socketio import SocketIO
-import freetype
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
@@ -67,6 +66,7 @@ class Subtitles:
                     return
             i+=1
 
+
 class VideoControler:
     def __init__(self,cap,subtitles,video_length,fps) -> None:
         self.cap = cap
@@ -74,6 +74,8 @@ class VideoControler:
         self.play = False
         self.video_length = video_length
         self.fps = fps
+        self.trim_start_value = 0
+        self.trim_stop_value = 0
 
     def handle_rewind(self,time):
    
@@ -221,7 +223,7 @@ def handle_stop():
 @socketio.on("rewind")
 def handle_rewind(data):
     print("Command: REWIND")
-    global cap, time_idx, subtitles
+    
     time = int(data['time'])
     
     app.video_controller.handle_rewind(time)
@@ -231,6 +233,16 @@ def handle_rewind(data):
    
     
     socketio.emit("status", {"message": f"Rewinding video to {time}s"})
+
+@socketio.on("trim_video")
+def handle_trim(data):
+    print("Command: TRIM VIDEO")
+    
+    start_value = int(float(data['valueLow']))
+    stop_value = int(float(data['valueUp']))
+    app.video_controller.trim_start_value = start_value
+    app.video_controller.trim_stop_value = stop_value
+    print(start_value)
 
 
 
