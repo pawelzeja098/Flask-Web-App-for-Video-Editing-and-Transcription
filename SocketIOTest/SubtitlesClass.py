@@ -34,7 +34,7 @@ class Subtitles:
             if time > self.text_times[i][0]:
                 if time < self.text_times[i + 1][0]:  
                     self.time_idx = i
-                    return
+                    return i
             i+=1
 
     def get_trimmed_subtitles(self,start,stop):

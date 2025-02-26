@@ -15,8 +15,7 @@ import eventlet
 import csv
 from flask import Flask, render_template
 from flask_socketio import SocketIO
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+
 from SocketIOTest.SubtitlesClass import Subtitles
 from SocketIOTest.VideoControlerClass import VideoControler
 
@@ -25,7 +24,7 @@ from SocketIOTest.VideoControlerClass import VideoControler
 app = Flask(__name__)
 socketio = SocketIO(app)
 play = False
-       
+
 cap = cv2.VideoCapture("E:/Programowanie/MOV2024.mp4")
 subtitles = Subtitles.capture_subtitles_csv()
 total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  
@@ -35,42 +34,7 @@ video_length = total_frames / fps
 app.video_controller = VideoControler(cap,subtitles,video_length,fps)        
 
 
-def put_text_on_image(img,text):
-    """
-    Putting text on frame
-    """
-    # ft2 = cv2.freetype.createFreeType2()
-    # font = "arial.ttf"
 
-    # # org
-    # img_height, img_width, _ = img.shape
-    # org = (50, img_height - 50)
-
-    # # fontScale
-    # fontScale = 1
- 
-    # # Blue color in BGR
-    # color = (255, 0, 0)
-
-    # # Line thickness of 2 px
-    # thickness = 2
-
-    # img = cv2.putText(img,ft2, org, font, fontScale, 
-    #              color, thickness, cv2.LINE_AA, False)
-
-    # return img
-
-    font_path="arial.ttf"
-    img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))  
-    draw = ImageDraw.Draw(img_pil)
-
-    font = ImageFont.truetype(font_path, 40)  
-    position = (50, img.shape[0] - 50)  
-    color = (255, 0, 0)  
-
-    draw.text(position, text, font=font, fill=color)  
-
-    return cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
 
 
 
@@ -122,7 +86,7 @@ def capture_frames():
 
         if curr_time/1000 > subtitles.text_times[subtitles.time_idx][0]:
             
-            frame = put_text_on_image(frame,subtitles.text[subtitles.time_idx]['text'])
+            frame = app.video_controller.put_text_on_image(frame,subtitles.text[subtitles.time_idx]['text'])
             if curr_time/1000 > subtitles.text_times[subtitles.time_idx][1]:
                 subtitles.time_idx += 1
 
@@ -183,6 +147,7 @@ def handle_trim(data):
     app.video_controller.trim_stop_value = stop_value
     trimmed_sub = app.video_controller.subtitles.get_trimmed_subtitles(start_value,stop_value)
     socketio.emit("trimmed_subtitles", {"subtitles": trimmed_sub})
+    app.video_controller.trim_video()
     
 
 
