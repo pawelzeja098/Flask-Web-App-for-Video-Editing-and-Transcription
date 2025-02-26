@@ -30,6 +30,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="runserver.py" />
+    <Compile Include="SocketIOTest\SubtitlesClass.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SocketIOTest\VideoControlerClass.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SocketIOTest\__init__.py" />
     <Compile Include="SocketIOTest\views.py" />
   </ItemGroup>

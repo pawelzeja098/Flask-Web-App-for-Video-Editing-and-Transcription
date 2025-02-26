@@ -17,6 +17,8 @@ from flask import Flask, render_template
 from flask_socketio import SocketIO
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from SocketIOTest.SubtitlesClass import Subtitles
+from SocketIOTest.VideoControlerClass import VideoControler
 
 
 # Initialize Flask application and Socket.IO
@@ -29,98 +31,98 @@ play = False
 # class Subtitles():
 #     def __init__(self) -> None:
 
-class Subtitles:
-    def __init__(self,text,text_times) -> None:
-        self.text = text
-        self.text_times = text_times
-        self.time_idx = 0
+# class Subtitles:
+#     def __init__(self,text,text_times) -> None:
+#         self.text = text
+#         self.text_times = text_times
+#         self.time_idx = 0
 
-    @staticmethod
-    def capture_subtitles_csv(filename ='E:/Programowanie/transcription.csv'):
-        text = []
-        text_times = []
-        with open(filename,'r',encoding='utf-8') as csv_file:
-            csvreader = csv.DictReader(csv_file)
-            for row in csvreader:
-                text.append({
-                    "text" : row["Sentence"]
-                    })
-                text_times.append((float(row["Start"]),float(row["Stop"])))
-        subtitles = Subtitles(text = text, text_times = text_times)
-        return subtitles
+#     @staticmethod
+#     def capture_subtitles_csv(filename ='E:/Programowanie/transcription.csv'):
+#         text = []
+#         text_times = []
+#         with open(filename,'r',encoding='utf-8') as csv_file:
+#             csvreader = csv.DictReader(csv_file)
+#             for row in csvreader:
+#                 text.append({
+#                     "text" : row["Sentence"]
+#                     })
+#                 text_times.append((float(row["Start"]),float(row["Stop"])))
+#         subtitles = Subtitles(text = text, text_times = text_times)
+#         return subtitles
         
 
-    def search_for_sub_idx(self,time):
-        """
-        Searching for subtitles index after rewinding film
-        """
-        i = 0
-        if time < self.text_times[0][0]:
-            self.time_idx = i
-            return
-        for i in range(len(self.text_times) - 1):
+#     def search_for_sub_idx(self,time):
+#         """
+#         Searching for subtitles index after rewinding film
+#         """
+#         i = 0
+#         if time < self.text_times[0][0]:
+#             self.time_idx = i
+#             return
+#         for i in range(len(self.text_times) - 1):
             
-            if time > self.text_times[i][0]:
-                if time < self.text_times[i + 1][0]:  
-                    self.time_idx = i
-                    return
-            i+=1
+#             if time > self.text_times[i][0]:
+#                 if time < self.text_times[i + 1][0]:  
+#                     self.time_idx = i
+#                     return
+#             i+=1
 
-    def get_trimmed_subtitles(self,start,stop):
-        i = 0
-        trimmed_subtitles = []
-        ts =''
-        start_idx = 0
-        stop_idx = 0
+#     def get_trimmed_subtitles(self,start,stop):
+#         i = 0
+#         trimmed_subtitles = []
+#         ts =''
+#         start_idx = 0
+#         stop_idx = 0
         
 
-        if start < self.text_times[0][0]:
-            start_idx = 0
+#         if start < self.text_times[0][0]:
+#             start_idx = 0
         
-        for i in range(len(self.text_times) - 1):
+#         for i in range(len(self.text_times) - 1):
             
-            if start > self.text_times[i][0]:
-                if start < self.text_times[i + 1][0]:  
-                    start_idx = i
+#             if start > self.text_times[i][0]:
+#                 if start < self.text_times[i + 1][0]:  
+#                     start_idx = i
                     
-            i+=1
-        i = 0
-        for i in range(len(self.text_times) - 1):
+#             i+=1
+#         i = 0
+#         for i in range(len(self.text_times) - 1):
             
-            if stop > self.text_times[i][0]:
-                if stop < self.text_times[i + 1][0]:  
-                    stop_idx = i
+#             if stop > self.text_times[i][0]:
+#                 if stop < self.text_times[i + 1][0]:  
+#                     stop_idx = i
                     
-            i+=1
+#             i+=1
 
-        for i in range(start_idx,stop_idx + 1):
+#         for i in range(start_idx,stop_idx + 1):
 
-            trimmed_subtitles.append(self.text[i]['text'])
-            ts += self.text[i]['text'] + ' '
-        return ts
+#             trimmed_subtitles.append(self.text[i]['text'])
+#             ts += self.text[i]['text'] + ' '
+#         return ts
 
         
 
 
 
 
-class VideoControler:
-    def __init__(self,cap,subtitles,video_length,fps) -> None:
-        self.cap = cap
-        self.subtitles = subtitles
-        self.play = False
-        self.video_length = video_length
-        self.fps = fps
-        self.trim_start_value = 0
-        self.trim_stop_value = 0
+# class VideoControler:
+#     def __init__(self,cap,subtitles,video_length,fps) -> None:
+#         self.cap = cap
+#         self.subtitles = subtitles
+#         self.play = False
+#         self.video_length = video_length
+#         self.fps = fps
+#         self.trim_start_value = 0
+#         self.trim_stop_value = 0
 
-    def handle_rewind(self,time):
+#     def handle_rewind(self,time):
    
-        self.subtitles.search_for_sub_idx(time)
-        self.cap.set(cv2.CAP_PROP_POS_MSEC, time * 1000)
+#         self.subtitles.search_for_sub_idx(time)
+#         self.cap.set(cv2.CAP_PROP_POS_MSEC, time * 1000)
 
-    def handle_start_stop(self,play):
-        self.play = play
+#     def handle_start_stop(self,play):
+#         self.play = play
    
     
 cap = cv2.VideoCapture("E:/Programowanie/MOV2024.mp4")
