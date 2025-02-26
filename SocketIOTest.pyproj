@@ -36,19 +36,13 @@
   <ItemGroup>
     <Folder Include="SocketIOTest\" />
     <Folder Include="SocketIOTest\static\" />
-    <Folder Include="SocketIOTest\static\content\" />
     <Folder Include="SocketIOTest\static\css\" />
     <Folder Include="SocketIOTest\static\fonts\" />
     <Folder Include="SocketIOTest\static\js\" />
-    <Folder Include="SocketIOTest\static\scripts\" />
     <Folder Include="SocketIOTest\templates\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
-    <Content Include="SocketIOTest\static\content\bootstrap.css" />
-    <Content Include="SocketIOTest\static\content\bootstrap.min.css" />
-    <Content Include="SocketIOTest\static\content\nouislider.css" />
-    <Content Include="SocketIOTest\static\content\site.css" />
     <Content Include="SocketIOTest\static\css\bootstrap-grid.css" />
     <Content Include="SocketIOTest\static\css\bootstrap-grid.css.map" />
     <Content Include="SocketIOTest\static\css\bootstrap-grid.min.css" />
@@ -81,6 +75,8 @@
     <Content Include="SocketIOTest\static\css\bootstrap.rtl.css.map" />
     <Content Include="SocketIOTest\static\css\bootstrap.rtl.min.css" />
     <Content Include="SocketIOTest\static\css\bootstrap.rtl.min.css.map" />
+    <Content Include="SocketIOTest\static\css\nouislider.css" />
+    <Content Include="SocketIOTest\static\css\site.css" />
     <Content Include="SocketIOTest\static\fonts\glyphicons-halflings-regular.eot" />
     <Content Include="SocketIOTest\static\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="SocketIOTest\static\fonts\glyphicons-halflings-regular.ttf" />
@@ -97,22 +93,11 @@
     <Content Include="SocketIOTest\static\js\bootstrap.js.map" />
     <Content Include="SocketIOTest\static\js\bootstrap.min.js" />
     <Content Include="SocketIOTest\static\js\bootstrap.min.js.map" />
-    <Content Include="SocketIOTest\static\scripts\bootstrap.js" />
-    <Content Include="SocketIOTest\static\scripts\bootstrap.min.js" />
-    <Content Include="SocketIOTest\static\scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="SocketIOTest\static\scripts\jquery-1.10.2.js" />
-    <Content Include="SocketIOTest\static\scripts\jquery-1.10.2.min.js" />
-    <Content Include="SocketIOTest\static\scripts\jquery-1.10.2.min.map" />
-    <Content Include="SocketIOTest\static\scripts\jquery.validate-vsdoc.js" />
-    <Content Include="SocketIOTest\static\scripts\jquery.validate.js" />
-    <Content Include="SocketIOTest\static\scripts\jquery.validate.min.js" />
-    <Content Include="SocketIOTest\static\scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="SocketIOTest\static\scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="SocketIOTest\static\scripts\modernizr-2.6.2.js" />
-    <Content Include="SocketIOTest\static\scripts\nouislider.js" />
-    <Content Include="SocketIOTest\static\scripts\respond.js" />
-    <Content Include="SocketIOTest\static\scripts\respond.min.js" />
-    <Content Include="SocketIOTest\static\scripts\_references.js" />
+    <None Include="SocketIOTest\static\js\_references.js" />
+    <Content Include="SocketIOTest\static\js\modernizr-2.6.2.js" />
+    <Content Include="SocketIOTest\static\js\nouislider.js" />
+    <Content Include="SocketIOTest\static\js\respond.js" />
+    <Content Include="SocketIOTest\static\js\respond.min.js" />
     <Content Include="SocketIOTest\templates\about.html" />
     <Content Include="SocketIOTest\templates\contact.html" />
     <Content Include="SocketIOTest\templates\index.html" />
