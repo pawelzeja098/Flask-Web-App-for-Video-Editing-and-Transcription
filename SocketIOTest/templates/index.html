@@ -2,40 +2,14 @@
 
 {% block content %}
 
-<!--<div class="jumbotron">
-    <h1>Flask</h1>
-    <p class="lead">Flask is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="http://flask.pocoo.org/" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
-</div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            Flask gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://flask.pocoo.org/docs/">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>The Python Package Index is a repository of software for the Python programming language.</p>
-        <p><a class="btn btn-default" href="https://pypi.python.org/pypi">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Microsoft Azure</h2>
-        <p>You can easily publish to Microsoft Azure using Visual Studio. Find out how you can host your application using a free trial today.</p>
-        <p><a class="btn btn-default" href="http://azure.microsoft.com">Learn more &raquo;</a></p>
-    </div>
-</div>-->
 
 
     <div class="container">
-        <h1>Live Camera Feed</h1>
+        <h1>Video player</h1>
 
         <div id="video-container">
-            <img id="video" src="" alt="Live Camera Feed">
+            <img id="video" src="" alt="Waiting for video">
         </div>
         <h2>Controll panel</h2>
         <div>
@@ -43,15 +17,15 @@
             <button type="button" class="btn btn-danger" onclick="sendCommand('stop')"><i class="bi bi-pause-fill"></i></button>
             <!--<button onclick="sendCommand('rewind')">Rewind</button>-->
 
-            <h3>Rewind to:</h3>
+            <h3>Rewind bar</h3>
             <input type="range" id="rewind-slider" min="0" max="800" value="0" step="1">
             <span id="current-time">0s</span>
-            <button type="button" class="btn btn-warning" onclick="select_trim_range()"><i class="bi bi-scissors"></i></button>
 
-            <h3>Cut</h3>
+
+            <h3><button id="cut_button" type="button" class="btn btn-warning" style="display: none;" onclick="select_trim_range()">Trim video<i class="bi bi-scissors"></i></button> </h3>
+
             <div id="slider"></div>
             <div id="range"></div>
-
             <div id="subtiles_trimmed" style="display: none;">
                 <p id="subtitles_trimmed" class="lh-1"></p>
             </div>
@@ -70,49 +44,7 @@
 <script defer>
     
 
-    //range.style.height = '400px';
-    //range.style.margin = '0 auto 30px';
-
-    //var valuesDivs = [
-    //    document.getElementById('range-value-1'),
-    //    document.getElementById('range-value-2'),
-    //    document.getElementById('range-value-3'),
-    //    document.getElementById('range-value-4')
-    //];
-
-    //var diffDivs = [
-    //    document.getElementById('range-diff-1'),
-    //    document.getElementById('range-diff-2'),
-    //    document.getElementById('range-diff-3')
-    //];
-
-    //range.noUiSlider.on('update', function (values, handle) {
-    //    valuesDivs[handle].innerHTML = values[handle];
-    //    diffDivs[0].innerHTML = values[1] - values[0];
-    //    diffDivs[1].innerHTML = values[2] - values[1];
-    //    diffDivs[2].innerHTML = values[3] - values[2];
-    //});
     
-    //var slider = document.querySelector("#kt_slider_basic");
-    //var valueMin = document.querySelector("#kt_slider_basic_min");
-    //var valueMax = document.querySelector("#kt_slider_basic_max");
-
-    //noUiSlider.create(slider, {
-    //    start: [20, 80],
-    //    connect: true,
-    //    range: {
-    //        "min": 0,
-    //        "max": 100
-    //    }
-    //});
-
-    //slider.noUiSlider.on("update", function (values, handle) {
-    //    if (handle) {
-    //        valueMax.innerHTML = values[handle];
-    //    } else {
-    //        valueMin.innerHTML = values[handle];
-    //    }
-    //});
     const socket = io();
 
     socket.on('connect', () => {
@@ -202,7 +134,8 @@
         const maxTime = data.max_time;
         document.getElementById('rewind-slider').max = maxTime;
         console.log("Max time set to:", maxTime);
-
+        const button = document.getElementById('cut_button');
+        button.style.display = 'inline';
         cut_slider(maxTime);
     });
     socket.on('curr_film_time', (data) => {
