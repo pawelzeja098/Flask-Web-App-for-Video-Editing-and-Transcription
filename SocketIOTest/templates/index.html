@@ -39,14 +39,14 @@
         </div>
         <h2>Controll panel</h2>
         <div>
-            <button type="button" class="btn btn-success" onclick="sendCommand('start')">Start</button>
-            <button type="button" class="btn btn-danger" onclick="sendCommand('stop')">Stop</button>
+            <button type="button" class="btn btn-success" onclick="sendCommand('start')"><i class="bi bi-play-fill"></i></button>
+            <button type="button" class="btn btn-danger" onclick="sendCommand('stop')"><i class="bi bi-pause-fill"></i></button>
             <!--<button onclick="sendCommand('rewind')">Rewind</button>-->
 
             <h3>Rewind to:</h3>
             <input type="range" id="rewind-slider" min="0" max="800" value="0" step="1">
             <span id="current-time">0s</span>
-            <button type="button" class="btn btn-warning" onclick="select_trim_range()">Cut</button>
+            <button type="button" class="btn btn-warning" onclick="select_trim_range()"><i class="bi bi-scissors"></i></button>
 
             <h3>Cut</h3>
             <div id="slider"></div>
