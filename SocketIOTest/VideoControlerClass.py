@@ -1,7 +1,9 @@
 import cv2
 import os
+from moviepy import video
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+import moviepy as mp
 
 class VideoControler:
     def __init__(self,cap,subtitles,video_length,fps) -> None:
@@ -69,13 +71,14 @@ class VideoControler:
         
 
         cap_trim = cv2.VideoCapture("E:/Programowanie/MOV2024.mp4")
+        
 
         cap_trim.set(cv2.CAP_PROP_POS_MSEC, self.trim_start_value * 1000)
 
         w = int(cap_trim.get(cv2.CAP_PROP_FRAME_WIDTH))
         h = int(cap_trim.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-        result_video = cv2.VideoWriter(os.path.join(output_folder, output_file), cv2.VideoWriter_fourcc(*"mp4v"), self.fps, (w, h))
+        result_video = cv2.VideoWriter(os.path.join(output_folder, output_file), cv2.VideoWriter_fourcc(*"XVID"), self.fps, (w, h))
         
         # skip_frames = 200
 
@@ -107,6 +110,16 @@ class VideoControler:
 
                 curr_time = cap_trim.get(cv2.CAP_PROP_POS_MSEC) / 1000
 
+        result_video.release()
         cap_trim.release()
+        
+        audio = mp.AudioFileClip("E:/Programowanie/MOV2024.mp4").subclipped(self.trim_start_value,self.trim_stop_value)
+        video = mp.VideoFileClip(os.path.join(output_folder, output_file))
+        output_file = 'trimmed_with_audio.mp4'
+        mp_audio = mp.CompositeAudioClip([audio])
+        video.audio = mp_audio
+        # video_with_audio = video.set_audio(audio)
+
+        video.write_videofile(os.path.join(output_folder, output_file))
 
 
