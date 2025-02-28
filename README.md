@@ -26,10 +26,13 @@ A web tool for viewing videos, trimming videos using a range slider and managing
 
 ## ✨ **Features**
 
-- Interactive slider for trimming videos within a specified time range.
 - Dynamic display of subtitles for the selected video segment.
 - WebSocket support 
 - Intuitive control panel (`Start`, `Stop`, `Rewind`, `Cut`).
+- Interactive slider for trimming videos within a specified time range.
+- Wisualize subtitles in trim range
+- Save trimmed video with subtitles and audio
+- 
 
 ---
 
