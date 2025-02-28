@@ -5,46 +5,46 @@
 
 
 
-    <div class="container">
-        <h1>Video player</h1>
+<div class="container">
+    <h1>Video player</h1>
 
-        <div id="video-container">
-            <img id="video" src="" alt="Waiting for video">
-        </div>
-        <h2>Controll panel</h2>
-        <div>
-            <button type="button" class="btn btn-success" onclick="sendCommand('start')"><i class="bi bi-play-fill"></i></button>
-            <button type="button" class="btn btn-danger" onclick="sendCommand('stop')"><i class="bi bi-pause-fill"></i></button>
-            <!--<button onclick="sendCommand('rewind')">Rewind</button>-->
+    <div id="video-container">
+        <img id="video" src="" alt="Waiting for video">
+    </div>
+    <h2>Controll panel</h2>
+    <div>
+        <button type="button" class="btn btn-success" onclick="sendCommand('start')"><i class="bi bi-play-fill"></i></button>
+        <button type="button" class="btn btn-danger" onclick="sendCommand('stop')"><i class="bi bi-pause-fill"></i></button>
+        <!--<button onclick="sendCommand('rewind')">Rewind</button>-->
 
-            <h3>Rewind bar</h3>
-            <input type="range" id="rewind-slider" min="0" max="800" value="0" step="1">
-            <span id="current-time">0s</span>
+        <h3>Rewind bar</h3>
+        <input type="range" id="rewind-slider" min="0" max="800" value="0" step="1">
+        <span id="current-time">0s</span>
 
 
-            <h3><button id="cut_button" type="button" class="btn btn-warning" style="display: none;" onclick="select_trim_range()">Trim video<i class="bi bi-scissors"></i></button> </h3>
+        <h3><button id="cut_button" type="button" class="btn btn-warning" style="display: none;" onclick="select_trim_range()">Trim video<i class="bi bi-scissors"></i></button> </h3>
 
-            <div id="slider"></div>
-            <div id="range"></div>
-            <div id="subtiles_trimmed" style="display: none;">
-                <p id="subtitles_trimmed" class="lh-1"></p>
-            </div>
-        </div>
-
-        <div id="status">
-            <span id="status-text" class="status-text status-disconnected">Connecting...</span>
+        <div id="slider"></div>
+        <div id="range"></div>
+        <div id="subtiles_trimmed" style="display: none;">
+            <p id="subtitles_trimmed" class="lh-1"></p>
         </div>
     </div>
 
-    
+    <div id="status">
+        <span id="status-text" class="status-text status-disconnected">Connecting...</span>
+    </div>
+</div>
+
+
 
 
 {% endblock %}
 {% block scripts %}
 <script defer>
-    
 
-    
+
+
     const socket = io();
 
     socket.on('connect', () => {
@@ -112,10 +112,10 @@
             }
 
         });
-        
+
     }
 
-    function select_trim_range(){
+    function select_trim_range() {
         const handleup = document.querySelector('.noUi-handle-upper');
         const handlelow = document.querySelector('.noUi-handle-lower')
 
@@ -124,11 +124,11 @@
             const valueUp = handleup.getAttribute('aria-valuenow');
             const valueLow = handlelow.getAttribute('aria-valuenow');
 
-            socket.emit('trim_video', { valueUp: valueUp,valueLow : valueLow})
+            socket.emit('trim_video', { valueUp: valueUp, valueLow: valueLow })
         }
     }
 
-    
+
 
     socket.on('set_max_time', (data) => {
         const maxTime = data.max_time;
@@ -148,7 +148,7 @@
         const time = this.value;
         document.getElementById('current-time').textContent = time + "s";
         socket.emit('rewind', { time: time })
-        
+
     });
 
     socket.on('trimmed_subtitles', (data) => {

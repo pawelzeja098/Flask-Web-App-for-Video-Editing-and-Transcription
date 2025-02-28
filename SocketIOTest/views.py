@@ -5,7 +5,8 @@ Routes and views for the flask application.
 from datetime import datetime
 from flask import render_template
 from SocketIOTest import app
-
+from SocketIOTest.globaldata import folder_path
+import os
 # @app.route('/')
 # @app.route('/home')
 # def home():
@@ -15,6 +16,23 @@ from SocketIOTest import app
 #         title='Home Page',
 #         year=datetime.now().year,
 #     )
+
+@app.route('/video_catalogue')
+def video_catalogue():
+    """Renders the video catalogue page"""
+    files = os.listdir(f"{folder_path}")
+    
+    files_mp4 = [f for f in files if f.endswith("mp4")]
+
+    files = [{"video": f} for f in files_mp4]
+    return render_template(
+        'video_catalogue.html',
+        title='Video Catalogue',
+        year=datetime.now().year,
+        files = files
+    )
+
+
 
 @app.route('/contact')
 def contact():

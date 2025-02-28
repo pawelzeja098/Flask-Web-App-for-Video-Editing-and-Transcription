@@ -7,6 +7,8 @@ import moviepy as mp
 
 class VideoControler:
     def __init__(self,cap,subtitles,video_length,fps) -> None:
+        
+        
         self.cap = cap
         self.subtitles = subtitles
         self.play = False
@@ -14,6 +16,8 @@ class VideoControler:
         self.fps = fps
         self.trim_start_value = 0
         self.trim_stop_value = 0
+
+
 
     def handle_rewind(self,time):
    
@@ -118,7 +122,7 @@ class VideoControler:
         output_file = 'trimmed_with_audio.mp4'
         mp_audio = mp.CompositeAudioClip([audio])
         video.audio = mp_audio
-        # video_with_audio = video.set_audio(audio)
+        
 
         video.write_videofile(os.path.join(output_folder, output_file))
 

@@ -30,6 +30,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="runserver.py" />
+    <Compile Include="SocketIOTest\globaldata.py" />
     <Compile Include="SocketIOTest\SubtitlesClass.py">
       <SubType>Code</SubType>
     </Compile>
@@ -99,6 +100,7 @@
     <Content Include="SocketIOTest\static\js\bootstrap.js.map" />
     <Content Include="SocketIOTest\static\js\bootstrap.min.js" />
     <Content Include="SocketIOTest\static\js\bootstrap.min.js.map" />
+    <Content Include="SocketIOTest\templates\video_catalogue.html" />
     <None Include="SocketIOTest\static\js\_references.js" />
     <Content Include="SocketIOTest\static\js\modernizr-2.6.2.js" />
     <Content Include="SocketIOTest\static\js\nouislider.js" />
