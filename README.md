@@ -40,10 +40,25 @@ A web tool for viewing videos, trimming videos using a range slider and managing
 
 - **Backend:** Python 3.x (e.g., with Flask) or Node.js  
 - **Frontend:** HTML, CSS, JavaScript  
-- **Libraries:** noUiSlider, Bootstrap (optional)
+- **Libraries:** noUiSlider, Bootstrap v5.2.3
 
----
+### 🔹 **FFmpeg**
+Required for video and audio processing
+  - On **Windows**, example to add `ffmpeg/bin` to your system's PATH in VSC:
+    ```powershell
+    $env:PATH += ";D:\ffmpeg\bin"
+    ```
+  - On **Linux**, set the `LD_LIBRARY_PATH` to include the necessary libraries in VSC:
+    ```bash
+    export LD_LIBRARY_PATH=/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu
+    ```
 
-## ⚙️ **Installation**
+### 🔹 **Python Dependencies**
+Install the required libraries using:
+```sh
+pip install -r requirements.txt
+```
+
+
 
 
