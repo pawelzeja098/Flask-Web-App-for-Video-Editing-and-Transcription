@@ -3,7 +3,8 @@ Routes and views for the flask application.
 """
 
 from datetime import datetime
-from flask import render_template
+import os.path
+from flask import render_template, request
 # from SocketIOTest import app
 from SocketIOTest.VideoControlerClass import VideoControler
 import SocketIOTest.globaldata as GD
@@ -37,6 +38,25 @@ def init_routes(app,socketio):
             files = files
         )
 
+    @app.route("/viewer")
+    def viewer():
+        
+
+        
+        if 'video' in request.args:
+            video = request.args.get('video')
+
+        if 'txt_csv' in request.args:            
+            txt_csv = request.args.get('txt_csv')
+
+
+        return render_template(
+            "index.html",
+            title="Video Viewer",
+            year=datetime.now().year,
+            message="Video Viewer",
+            video=video
+        )
 
 
     @app.route('/contact')
@@ -68,27 +88,30 @@ def init_routes(app,socketio):
 
 
     @socketio.on("start")
-    def handle_start():
+    def handle_start(data):
         print(" Command: START")
         filepath = "E:/Programowanie/MOV2024.mp4"
         
+        filepath = data.get("video")
 
+        video_path = os.path.join(GD.folder_path,filepath)
 
         if GD.th is not None:
-            GD.th.handle_start_stop(False)
-            GD.th.running = False
+            GD.th.handle_start_stop(play=True)
+            GD.th.running = True
 
+        else:
         
 
-        GD.th = VideoControler(filepath,GD.socketio)
+            GD.th = VideoControler(video_path,GD.socketio)
 
-        GD.th.handle_start_stop(play=True)
+            GD.th.handle_start_stop(play=True)
 
         # GD.th.handle_start_stop(play=True)
         
 
     @socketio.on("stop")
-    def handle_stop():
+    def handle_stop(data):
         print(" Command: STOP")
         GD.th.handle_start_stop(play=False)
         socketio.emit("status", {"message": "Streaming stopped"})

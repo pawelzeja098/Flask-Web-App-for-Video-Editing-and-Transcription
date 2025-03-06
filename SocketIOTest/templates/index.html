@@ -83,8 +83,13 @@
 
     }
     function sendCommand(command) {
-        console.log("Command:", command);
-        socket.emit(command);
+        console.log(command, { "Command": command, "video": '{{ video }}'});
+
+        socket.emit(command, { "Command": command, "video": '{{ video }}' });
+
+
+        //console.log("Command:", command);
+        //socket.emit(command);
     }
     //function sendRewind() {
 

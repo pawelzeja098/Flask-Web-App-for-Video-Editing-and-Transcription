@@ -1,6 +1,5 @@
 import cv2
 import os
-from moviepy import video
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from SocketIOTest.SubtitlesClass import Subtitles
@@ -8,6 +7,7 @@ import moviepy as mp
 import threading
 import eventlet
 import base64
+import time
 
 class VideoControler:
     def __init__(self,filepath,socketio) -> None:
@@ -16,7 +16,7 @@ class VideoControler:
         self.filepath = filepath
 
 
-        self.cap = cv2.VideoCapture("E:/Programowanie/MOV2024.mp4")
+        self.cap = cv2.VideoCapture(filepath)
         self.subtitles = Subtitles.capture_subtitles_csv()
         self.play = False
         
@@ -27,6 +27,7 @@ class VideoControler:
         self.trim_start_value = 0
         self.trim_stop_value = 0
 
+        self.lock_cap = threading.Lock()
         self.thread = threading.Thread(target=self.capture_frames)
 
         #automatic kill thread
@@ -38,7 +39,10 @@ class VideoControler:
     def handle_rewind(self,time):
    
         self.subtitles.search_for_sub_idx(time)
+        self.cap.release()
+        self.cap = cv2.VideoCapture(self.filepath)
         self.cap.set(cv2.CAP_PROP_POS_MSEC, time * 1000)
+        self.handle_start_stop(True)
 
     def handle_start_stop(self,play):
         self.socketio.emit("status", {"message": "Streaming started"})
@@ -156,28 +160,7 @@ class VideoControler:
 
     def capture_frames(self):
         """Capture frames from the default camera and emit them to clients."""
-        # cap = cv2.VideoCapture(0)
-    
-        # cap = get_frames_from_film(frame = 100)
-        # video_path = "E:/Programowanie/MOV2024.mp4"
-        # cap = cv2.VideoCapture(video_path)
-
         
-
-
-        # subtitles, text_time = capture_subtitles()
-        
-    
-        # sub_idx = 0
-        # time_idx = 0
-
-
-
-        # total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  
-        # fps = cap.get(cv2.CAP_PROP_FPS)  
-        # video_length = total_frames / fps  
-        # eventlet.sleep(0.0001)
-        # socketio.emit("set_max_time", {"max_time": int(video_length)})
 
         if not self.cap.isOpened():
             print("Error: Could not open camera.")
@@ -189,8 +172,11 @@ class VideoControler:
                 eventlet.sleep(0.1)
                 continue
 
-            ret, frame = self.cap.read()
-            curr_time = self.cap.get(cv2.CAP_PROP_POS_MSEC)
+            starttime=time.time()
+
+            with self.lock_cap:
+                ret, frame = self.cap.read()
+                curr_time = self.cap.get(cv2.CAP_PROP_POS_MSEC)
         
         
 
@@ -216,7 +202,8 @@ class VideoControler:
             curr_time_s = int(curr_time/1000)
             self.socketio.emit('frame', jpg_as_text)
             self.socketio.emit('curr_film_time', {"curr_time" : curr_time_s})
-            eventlet.sleep(1 / (self.fps * 1.5))
-        
+            eventlet.sleep(1 / (self.fps * 1.5) - (time.time()-starttime))
+            
+            starttime=time.time()
 
         cap.release()

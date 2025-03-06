@@ -22,10 +22,10 @@
 
                 <a onclick="videoPath()" href="viewer?video={{ file.video }}" class="btn btn-primary">Choose video</a>
 
-                {% if file.txt_csv %}
+                <!--{% if file.txt_csv %}-->
                 <a href="viewer?video={{ file.video }}" class="btn btn-primary">Choose video</a>
 
-                {% endif %}
+                <!--{% endif %}-->
 
             </li>
 
@@ -44,7 +44,7 @@
 
 <script>
     function videoPath() {
-        document.getElementById
+        //document.getElementById
         console.log("Command:", command);
         socket.emit(command);
     }
