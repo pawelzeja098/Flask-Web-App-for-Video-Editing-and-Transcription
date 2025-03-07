@@ -8,8 +8,22 @@ import threading
 import eventlet
 import base64
 import time
+import tempfile
 
 class VideoControler:
+
+    @property
+    def  CurrentTime(self,_time):
+        """The price property."""
+        return self._currentTime
+
+    @CurrentTime.setter
+    def CurrentTime(self, value):
+        """   """
+        with self.lock_cap:
+            self.cap.set(cv2.CAP_PROP_POS_MSEC, value * 1000)
+        self._currentTime = value
+
     def __init__(self,filepath,socketio) -> None:
         
         self.socketio = socketio
@@ -206,4 +220,4 @@ class VideoControler:
             
             starttime=time.time()
 
-        cap.release()
+        self.cap.release()

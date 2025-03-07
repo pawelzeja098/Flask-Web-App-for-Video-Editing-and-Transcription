@@ -121,9 +121,13 @@ def init_routes(app,socketio):
     def handle_rewind(data):
         print("Command: REWIND")
     
-        time = int(data['time'])
-    
-        GD.th.handle_rewind(time)
+        if GD.th is not None:
+            #GD.th.handle_start_stop(False)
+            
+            time = int(data["time"])
+            GD.th.CurrentTime=time  #  cap.set(cv2.CAP_PROP_POS_MSEC, time * 1000)
+
+            GD.th.socketio.emit("status", {"message": f"Rewinding video to {time}s"})
         # app.video_controller.subtitles.search_for_sub_idx(time)
     
         # app.video_controller.cap.set(cv2.CAP_PROP_POS_MSEC, time * 1000)
