@@ -32,7 +32,7 @@ A web tool for viewing videos, trimming videos using a range slider and managing
 - Interactive slider for trimming videos within a specified time range.
 - Wisualize subtitles in trim range
 - Save trimmed video with subtitles and audio
-- 
+- Video viewer in thread
 
 ---
 
