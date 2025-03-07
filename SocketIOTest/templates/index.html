@@ -5,46 +5,52 @@
 
 
 
-    <div class="container">
-        <h1>Video player</h1>
+<div class="container">
+    <h1>Video player</h1>
 
-        <div id="video-container">
-            <img id="video" src="" alt="Waiting for video">
+    <div id="video-container">
+        <img id="video" src="" alt="Waiting for video">
+    </div>
+    <h2>Controll panel</h2>
+    <div>
+        <button type="button" class="btn btn-success" onclick="sendCommand('start')"><i class="bi bi-play-fill"></i></button>
+        <button type="button" class="btn btn-danger" onclick="sendCommand('stop')"><i class="bi bi-pause-fill"></i></button>
+        <!--<button onclick="sendCommand('rewind')">Rewind</button>-->
+
+        <h3>Rewind bar</h3>
+        <input type="range" id="rewind-slider" min="0" max="800" value="0" step="1">
+        <span id="current-time">0s</span>
+
+
+        <h3>
+            <button id="cut_button" type="button" class="btn btn-warning" style="display: none;" onclick="select_trim_range()">Trim video<i class="bi bi-scissors"></i></button>
+        </h3>
+
+        <div id="progress_div" class="progress" style="display:none">
+            <div id="progress_bar" class="progress-bar" role="progressbar" aria-label="Example with label" style="width: 0%; display: none;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
         </div>
-        <h2>Controll panel</h2>
-        <div>
-            <button type="button" class="btn btn-success" onclick="sendCommand('start')"><i class="bi bi-play-fill"></i></button>
-            <button type="button" class="btn btn-danger" onclick="sendCommand('stop')"><i class="bi bi-pause-fill"></i></button>
-            <!--<button onclick="sendCommand('rewind')">Rewind</button>-->
 
-            <h3>Rewind bar</h3>
-            <input type="range" id="rewind-slider" min="0" max="800" value="0" step="1">
-            <span id="current-time">0s</span>
-
-
-            <h3><button id="cut_button" type="button" class="btn btn-warning" style="display: none;" onclick="select_trim_range()">Trim video<i class="bi bi-scissors"></i></button> </h3>
-
-            <div id="slider"></div>
-            <div id="range"></div>
-            <div id="subtiles_trimmed" style="display: none;">
-                <p id="subtitles_trimmed" class="lh-1"></p>
-            </div>
-        </div>
-
-        <div id="status">
-            <span id="status-text" class="status-text status-disconnected">Connecting...</span>
+        <div id="slider"></div>
+        <div id="range"></div>
+        <div id="subtiles_trimmed" style="display: none;">
+            <p id="subtitles_trimmed" class="lh-1"></p>
         </div>
     </div>
 
-    
+    <div id="status">
+        <span id="status-text" class="status-text status-disconnected">Connecting...</span>
+    </div>
+</div>
+
+
 
 
 {% endblock %}
 {% block scripts %}
 <script defer>
-    
 
-    
+
+
     const socket = io();
 
     socket.on('connect', () => {
@@ -77,8 +83,13 @@
 
     }
     function sendCommand(command) {
-        console.log("Command:", command);
-        socket.emit(command);
+        console.log(command, { "Command": command, "video": '{{ video }}'});
+
+        socket.emit(command, { "Command": command, "video": '{{ video }}' });
+
+
+        //console.log("Command:", command);
+        //socket.emit(command);
     }
     //function sendRewind() {
 
@@ -112,23 +123,26 @@
             }
 
         });
-        
+
     }
 
-    function select_trim_range(){
+    function select_trim_range() {
         const handleup = document.querySelector('.noUi-handle-upper');
-        const handlelow = document.querySelector('.noUi-handle-lower')
-
+        const handlelow = document.querySelector('.noUi-handle-lower');
+        const progress_bar = document.getElementById('progress_bar');
+        const progress_div = document.getElementById('progress_div');
+        progress_bar.style.display = 'inline';
+        progress_div.style.display = 'flex';
 
         if (handleup && handlelow) {
             const valueUp = handleup.getAttribute('aria-valuenow');
             const valueLow = handlelow.getAttribute('aria-valuenow');
 
-            socket.emit('trim_video', { valueUp: valueUp,valueLow : valueLow})
+            socket.emit('trim_video', { valueUp: valueUp, valueLow: valueLow })
         }
     }
 
-    
+
 
     socket.on('set_max_time', (data) => {
         const maxTime = data.max_time;
@@ -148,7 +162,7 @@
         const time = this.value;
         document.getElementById('current-time').textContent = time + "s";
         socket.emit('rewind', { time: time })
-        
+
     });
 
     socket.on('trimmed_subtitles', (data) => {
@@ -162,6 +176,27 @@
         } else {
             subtitlesDiv.style.display = 'none';
         }
+    });
+
+    socket.on('progress_update', (data) => {
+        const progressValue = data.progress;
+        const progress_bar = document.getElementById('progress_bar');
+        if (progressValue == 'Done') {
+            progress_bar.innerText = `Trimmed video saved`;
+            progress_bar.setAttribute('class', "progress-bar bg-success");
+
+        } else {
+            progress_bar.setAttribute('aria-valuenow', progressValue);
+            progress_bar.style.width = `${progressValue}%`;
+
+            progress_bar.innerText = `${progressValue}%`;
+        }
+
+        
+
+        
+        /*document.getElementById('current-time').textContent = curr_time + "s"*/
+
     });
 
 </script>

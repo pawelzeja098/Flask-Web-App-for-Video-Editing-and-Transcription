@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+
+
+{% block headblock %}
+
+{% endblock %}
+
+{% block content %}
+
+
+
+<div class="card">
+    <input class="form-check-input me-1" type="checkbox" value="Tylko bez transkrycji" aria-label="...">
+    <div class="card-body">
+        <ul class="list-group">
+            {% for file in files %}
+
+            <li class="list-group-item">
+                <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                {{ file.video }}
+
+                <a onclick="videoPath()" href="viewer?video={{ file.video }}" class="btn btn-primary">Choose video</a>
+
+                <!--{% if file.txt_csv %}-->
+                <a href="viewer?video={{ file.video }}" class="btn btn-primary">Choose video</a>
+
+                <!--{% endif %}-->
+
+            </li>
+
+
+            {% endfor %}
+        </ul>
+
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+    function videoPath() {
+        //document.getElementById
+        console.log("Command:", command);
+        socket.emit(command);
+    }
+
+
+</script>
+
+{% endblock %}

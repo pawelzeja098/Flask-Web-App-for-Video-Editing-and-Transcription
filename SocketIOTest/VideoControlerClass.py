@@ -1,26 +1,66 @@
 import cv2
 import os
-from moviepy import video
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from SocketIOTest.SubtitlesClass import Subtitles
 import moviepy as mp
+import threading
+import eventlet
+import base64
+import time
+import tempfile
 
 class VideoControler:
-    def __init__(self,cap,subtitles,video_length,fps) -> None:
-        self.cap = cap
-        self.subtitles = subtitles
+
+    @property
+    def  CurrentTime(self,_time):
+        """The price property."""
+        return self._currentTime
+
+    @CurrentTime.setter
+    def CurrentTime(self, value):
+        """   """
+        with self.lock_cap:
+            self.cap.set(cv2.CAP_PROP_POS_MSEC, value * 1000)
+        self._currentTime = value
+
+    def __init__(self,filepath,socketio) -> None:
+        
+        self.socketio = socketio
+        self.filepath = filepath
+
+
+        self.cap = cv2.VideoCapture(filepath)
+        self.subtitles = Subtitles.capture_subtitles_csv()
         self.play = False
-        self.video_length = video_length
-        self.fps = fps
+        
+        total_frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))  
+        self.fps = self.cap.get(cv2.CAP_PROP_FPS)  
+        self.video_length = total_frames / self.fps
+        
         self.trim_start_value = 0
         self.trim_stop_value = 0
+
+        self.lock_cap = threading.Lock()
+        self.thread = threading.Thread(target=self.capture_frames)
+
+        #automatic kill thread
+        self.thread.daemon = True
+
+        self.thread.start()
+
 
     def handle_rewind(self,time):
    
         self.subtitles.search_for_sub_idx(time)
+        self.cap.release()
+        self.cap = cv2.VideoCapture(self.filepath)
         self.cap.set(cv2.CAP_PROP_POS_MSEC, time * 1000)
+        self.handle_start_stop(True)
 
     def handle_start_stop(self,play):
+        self.socketio.emit("status", {"message": "Streaming started"})
+        self.socketio.emit("set_max_time", {"max_time": int(self.video_length)})
         self.play = play
     
 
@@ -90,6 +130,7 @@ class VideoControler:
         
         text_time_start = self.subtitles.search_for_sub_idx(self.trim_start_value)
 
+        trim_range = self.trim_stop_value - self.trim_start_value
         while curr_time < self.trim_stop_value:
 
             ret, frame = cap_trim.read()
@@ -107,6 +148,11 @@ class VideoControler:
 
                 result_video.write(frame)
 
+                progress = (((curr_time - self.trim_start_value) / trim_range)) * 100;
+
+
+
+                self.socketio.emit("progress_update",{"progress" :int(progress)})
 
                 curr_time = cap_trim.get(cv2.CAP_PROP_POS_MSEC) / 1000
 
@@ -118,8 +164,60 @@ class VideoControler:
         output_file = 'trimmed_with_audio.mp4'
         mp_audio = mp.CompositeAudioClip([audio])
         video.audio = mp_audio
-        # video_with_audio = video.set_audio(audio)
+        
 
         video.write_videofile(os.path.join(output_folder, output_file))
 
+        self.socketio.emit("progress_update",{"progress" : 'Done'})
 
+
+
+    def capture_frames(self):
+        """Capture frames from the default camera and emit them to clients."""
+        
+
+        if not self.cap.isOpened():
+            print("Error: Could not open camera.")
+            return
+
+        # text_time = subtitles[0]['start']
+        while True:
+            if not self.play:
+                eventlet.sleep(0.1)
+                continue
+
+            starttime=time.time()
+
+            with self.lock_cap:
+                ret, frame = self.cap.read()
+                curr_time = self.cap.get(cv2.CAP_PROP_POS_MSEC)
+        
+        
+
+            if not ret:
+                # print("Error: Failed to capture frame.")
+                self.play = False
+                continue
+       
+
+            if curr_time/1000 > self.subtitles.text_times[self.subtitles.time_idx][0]:
+            
+                frame = self.put_text_on_image(frame,self.subtitles.text[self.subtitles.time_idx]['text'])
+                if curr_time/1000 > self.subtitles.text_times[self.subtitles.time_idx][1]:
+                    self.subtitles.time_idx += 1
+
+
+            # Encode the frame as JPEG
+            _, buffer = cv2.imencode('.jpg', frame)
+            jpg_as_text = base64.b64encode(buffer).decode('utf-8')
+
+            # Emit the encoded frame to all connected clients
+        
+            curr_time_s = int(curr_time/1000)
+            self.socketio.emit('frame', jpg_as_text)
+            self.socketio.emit('curr_film_time', {"curr_time" : curr_time_s})
+            eventlet.sleep(1 / (self.fps * 1.5) - (time.time()-starttime))
+            
+            starttime=time.time()
+
+        self.cap.release()

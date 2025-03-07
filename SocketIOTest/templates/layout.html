@@ -86,10 +86,12 @@
         #rewind-slider {
             width: 100%;
             max-width: 500px;
+            
         }
 
         #slider {
             margin-bottom: 10px;
+            margin-top: 50px;
         }
 
         #subtiles_trimmed {
@@ -98,6 +100,14 @@
         .navbar {
             width: 100%;
         }
+
+        .progress_bar {
+            margin-bottom: 10px;
+            margin-top: 10px;
+            height: 20px;
+        }
+
+
     </style>
 </head>
 
@@ -113,6 +123,7 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('home') }}">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}">About</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('contact') }}">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('video_catalogue') }}">Video Catalogue</a></li>
                 </ul>
             </div>
         </div>

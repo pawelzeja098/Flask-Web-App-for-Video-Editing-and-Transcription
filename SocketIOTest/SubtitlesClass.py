@@ -37,6 +37,7 @@ class Subtitles:
                     return i
             i+=1
 
+
     def get_trimmed_subtitles(self,start,stop):
         i = 0
         trimmed_subtitles = []
