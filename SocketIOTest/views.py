@@ -7,6 +7,7 @@ import os.path
 from flask import render_template, request
 # from SocketIOTest import app
 from SocketIOTest.VideoControlerClass import VideoControler
+from SocketIOTest.TrascriptionWhisper.TranscriptionControllerClass import TranscriptionController
 import SocketIOTest.globaldata as GD
 import os
 # @app.route('/')
@@ -29,8 +30,14 @@ def init_routes(app,socketio):
         files = os.listdir(f"{GD.folder_path}")
     
         files_mp4 = [f for f in files if f.endswith("mp4")]
+        files_csv = [f for f in files if f.endswith("csv")]
 
-        files = [{"video": f} for f in files_mp4]
+        files_onlymp4 = [{"video": f} for f in files_mp4 if not f.replace(".mp4", ".csv") in files_csv]        
+
+        files = files_onlymp4
+        files.extend([{"video": f, "txt_csv": f.replace(".mp4", ".csv")} for f in files_mp4 if f.replace(".mp4", ".csv") in files_csv])
+
+        # files = [{"video": f} for f in files_mp4]
         return render_template(
             'video_catalogue.html',
             title='Video Catalogue',
@@ -146,3 +153,18 @@ def init_routes(app,socketio):
         trimmed_sub = GD.th.subtitles.get_trimmed_subtitles(start_value,stop_value)
         socketio.emit("trimmed_subtitles", {"subtitles": trimmed_sub})
         GD.th.trim_video()
+
+
+    @socketio.on("start_transcription")
+    def handle_transcription(data):
+        print("Command: START TRANSCRIPTION")
+    
+        videoFile = data['VideoFile']
+
+        tc = TranscriptionController(videoFile)
+       
+        # GD.th.trim_start_value = start_value
+        # GD.th.trim_stop_value = stop_value
+        # trimmed_sub = GD.th.subtitles.get_trimmed_subtitles(start_value,stop_value)
+        # socketio.emit("trimmed_subtitles", {"subtitles": trimmed_sub})
+        # GD.th.trim_video()

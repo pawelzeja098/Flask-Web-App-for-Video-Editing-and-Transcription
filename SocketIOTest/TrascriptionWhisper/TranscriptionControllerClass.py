@@ -4,11 +4,37 @@ from pydub import AudioSegment
 import time
 import csv
 from moviepy import VideoFileClip
+import os
+
+import threading
+import queue
+from globaldata import folder_path
 
 
 class TranscriptionController:
     def __init__(self,video_path) -> None:
         self.video_path = video_path
+        self.folder_path = folder_path
+        
+        self.task_queue = queue.Queue()
+
+        self.lock_cap = threading.Lock()
+        self.thread = threading.Thread(target=self.main_loop)
+
+        #automatic kill thread
+        self.thread.daemon = True
+
+        self.thread.start()
+
+    def main_loop(self):
+
+        audio = self.get_audio_from_video(self.video_path)
+
+        result, word_by_word = self.transcribe(audio)
+
+        self.convert_to_csv(result,word_by_word)
+
+        
 
     def get_audio_from_video(self,video_path):
         """
@@ -42,7 +68,7 @@ class TranscriptionController:
     # Convert to numpy array and normalize audio data to be between -1.0 and 1.0
         audio = np.array(trimmed_audio.get_array_of_samples()).astype(np.float32) / 32768.0
 
-        return audio
+        return audio, False
 
     def transcribe(self,audio,word_by_word = False,model = "large"):
         """
@@ -80,8 +106,15 @@ class TranscriptionController:
         word_by_word - bool If you want to get every said word time
         """
 
+        
+
+        transc_file = self.video_path
+        transc_file.replace(".mp4", ".csv")
+
+        transc_file_fold = os.path.join(self.folder_path,transc_file)
+
         if word_by_word:
-            with open("transcription.csv", "w", newline="", encoding="utf-8") as csvfile:
+            with open(transc_file_fold, "w", newline="", encoding="utf-8") as csvfile:
                 csvwriter = csv.writer(csvfile)
             
                 csvwriter.writerow(["word", "start", "stop"])
@@ -92,7 +125,7 @@ class TranscriptionController:
                         end = word_info["end"]
                         csvwriter.writerow([word, f"{start:.2f}", f"{end:.2f}"])
         else:
-            with open("transcription.csv", "w",newline = "", encoding="utf-8") as csvfile:
+            with open(transc_file_fold, "w",newline = "", encoding="utf-8") as csvfile:
                 csvwriter = csv.writer(csvfile)
                 csvwriter.writerow(["text", "start", "stop"])
                 for segment in result["segments"]:  

@@ -19,13 +19,14 @@
             <li class="list-group-item">
                 <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
                 {{ file.video }}
+                
+                <a onclick="start_transcription('{{ file.video }}')" href="viewer?video={{ file.video }}" class="btn btn-primary">Transcript Video</a>
 
-                <a onclick="videoPath()" href="viewer?video={{ file.video }}" class="btn btn-primary">Choose video</a>
+                {% if file.txt_csv %}
 
-                <!--{% if file.txt_csv %}-->
-                <a href="viewer?video={{ file.video }}" class="btn btn-primary">Choose video</a>
+                <a onclick="videoPath()" href="viewer?video={{ file.video }}" class="btn btn-primary">Play video</a>
 
-                <!--{% endif %}-->
+                {% endif %}
 
             </li>
 
@@ -49,6 +50,9 @@
         socket.emit(command);
     }
 
+    function start_transcription(videoFile) {
+        socket.emit('start_transcription', { VideoFile: videoFile})
+    }
 
 </script>
 
