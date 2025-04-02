@@ -20,7 +20,7 @@
                 <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
                 {{ file.video }}
                 
-                <a onclick="start_transcription('{{ file.video }}')" href="viewer?video={{ file.video }}" class="btn btn-primary">Transcript Video</a>
+                <a onclick="start_transcription('{{ file.video }}')"  class="btn btn-primary">Transcript Video</a>
 
                 {% if file.txt_csv %}
 
@@ -44,14 +44,17 @@
 {% block scripts %}
 
 <script>
+    const socket = io();
+
     function videoPath() {
         //document.getElementById
         console.log("Command:", command);
         socket.emit(command);
+        
     }
 
     function start_transcription(videoFile) {
-        socket.emit('start_transcription', { VideoFile: videoFile})
+        socket.emit('start_transcription', { VideoFile: videoFile });
     }
 
 </script>

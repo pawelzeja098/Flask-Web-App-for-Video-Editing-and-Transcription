@@ -5,17 +5,17 @@ import time
 import csv
 from moviepy import VideoFileClip
 import os
-
+import torch
 import threading
 import queue
-from globaldata import folder_path
+from SocketIOTest.globaldata import folder_path
 
 
 class TranscriptionController:
     def __init__(self,video_path) -> None:
         self.video_path = video_path
         self.folder_path = folder_path
-        
+        self.video_path = os.path.join(self.folder_path,video_path)
         self.task_queue = queue.Queue()
 
         self.lock_cap = threading.Lock()
@@ -68,9 +68,9 @@ class TranscriptionController:
     # Convert to numpy array and normalize audio data to be between -1.0 and 1.0
         audio = np.array(trimmed_audio.get_array_of_samples()).astype(np.float32) / 32768.0
 
-        return audio, False
+        return audio
 
-    def transcribe(self,audio,word_by_word = False,model = "large"):
+    def transcribe(self,audio,word_by_word = False):
         """
         Trascribe audio using whisper
 
@@ -79,10 +79,12 @@ class TranscriptionController:
         word_by_word - bool If you want to get every said word time
         model - whisper model by deafult large
         """
-    
-        model = whisper.load_model("large")
-    
+        
+        print(torch.cuda.is_available()) 
 
+        model = whisper.load_model("medium")
+    
+        
     
     
         start = time.time()
@@ -109,9 +111,9 @@ class TranscriptionController:
         
 
         transc_file = self.video_path
-        transc_file.replace(".mp4", ".csv")
+        transc_file_csv = transc_file.replace(".mp4", ".csv")
 
-        transc_file_fold = os.path.join(self.folder_path,transc_file)
+        transc_file_fold = os.path.join(self.folder_path,transc_file_csv)
 
         if word_by_word:
             with open(transc_file_fold, "w", newline="", encoding="utf-8") as csvfile:

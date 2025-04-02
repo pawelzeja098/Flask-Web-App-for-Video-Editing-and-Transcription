@@ -97,23 +97,40 @@ def init_routes(app,socketio):
     @socketio.on("start")
     def handle_start(data):
         print(" Command: START")
-        filepath = "E:/Programowanie/MOV2024.mp4"
+        # filepath = "E:/Programowanie/MOV2024.mp4"
         
         filepath = data.get("video")
 
         video_path = os.path.join(GD.folder_path,filepath)
 
-        if GD.th is not None:
-            GD.th.handle_start_stop(play=True)
-            GD.th.running = True
+        # if GD.th is not None:
+        #     if GD.th.name != video_path:
+        #         GD.th.stop_thread()
 
-        else:
+        #         GD.th = VideoControler(video_path,GD.socketio)
+
+        #         GD.th.handle_start_stop(play=True)
+        #     else:
+            
+        #         GD.th.handle_start_stop(play=True)
+        #         GD.th.running = True
+
+
+        # else:
         
 
-            GD.th = VideoControler(video_path,GD.socketio)
+        #     GD.th = VideoControler(video_path,GD.socketio)
 
-            GD.th.handle_start_stop(play=True)
+        #     GD.th.handle_start_stop(play=True)
+        if GD.th is not None:
+            GD.th.handle_start_stop(False)
+            GD.th.running = False
 
+        
+    
+        GD.th = VideoControler(video_path,GD.socketio)
+
+        GD.th.handle_start_stop(True)
         # GD.th.handle_start_stop(play=True)
         
 
