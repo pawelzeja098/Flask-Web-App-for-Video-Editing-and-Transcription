@@ -64,5 +64,14 @@ pip install -r requirements.txt
 
 
 
+![1](https://github.com/user-attachments/assets/5d9aab88-e6c1-43d0-a7e0-9fee78e5ff35)
 
+
+![2](https://github.com/user-attachments/assets/f1567af3-672c-47d3-8f32-25d43147d94f)
+
+
+![3](https://github.com/user-attachments/assets/2f77acdb-ae68-49f7-97d3-231e86fd3047)
+
+
+![4](https://github.com/user-attachments/assets/38be5c1f-dd5e-4bdc-b0e1-2ddea8587929)
 
