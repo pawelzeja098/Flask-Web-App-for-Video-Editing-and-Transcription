@@ -33,6 +33,7 @@ A web tool for viewing videos, trimming videos using a range slider and managing
 - Wisualize subtitles in trim range
 - Save trimmed video with subtitles and audio
 - Video viewer in thread
+- Generate transcription using Whisper-AI (working in independent thread)
 
 ---
 
