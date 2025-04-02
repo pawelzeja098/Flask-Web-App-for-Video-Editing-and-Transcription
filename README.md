@@ -9,12 +9,10 @@ A web application for trimming videos with an interactive range slider and manag
 2. [Features](#-features)
 3. [Requirements](#-requirements)
 4. [Installation](#-installation)
-5. [Configuration](#-configuration)
-6. [Usage](#-usage)
-7. [Screenshots](#-screenshots)
-8. [Known Issues](#-known-issues)
-9. [Authors](#-authors)
-10. [License](#-license)
+5. [Screenshots](#-screenshots)
+6. [Known Issues](#-known-issues)
+7. [Authors](#-authors)
+8. [License](#-license)
 
 ---
 
