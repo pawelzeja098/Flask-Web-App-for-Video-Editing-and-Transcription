@@ -1,3 +1,4 @@
+import os.path
 import cv2
 import os
 import numpy as np
@@ -25,13 +26,14 @@ class VideoControler:
         self._currentTime = value
 
     def __init__(self,filepath,socketio) -> None:
-        
+        self.name = filepath
         self.socketio = socketio
         self.filepath = filepath
 
 
         self.cap = cv2.VideoCapture(filepath)
-        self.subtitles = Subtitles.capture_subtitles_csv()
+        filepath_csv = filepath.replace(".mp4", ".csv")
+        self.subtitles = Subtitles.capture_subtitles_csv(filepath_csv)
         self.play = False
         
         total_frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))  
@@ -42,6 +44,12 @@ class VideoControler:
         self.trim_stop_value = 0
 
         self.lock_cap = threading.Lock()
+
+        self._stop_event = threading.Event()
+
+        self.running = True
+
+
         self.thread = threading.Thread(target=self.capture_frames)
 
         #automatic kill thread
@@ -93,7 +101,7 @@ class VideoControler:
         img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))  
         draw = ImageDraw.Draw(img_pil)
 
-        font = ImageFont.truetype(font_path, 40)  
+        font = ImageFont.truetype(font_path, 50)  
         position = (50, img.shape[0] - 50)  
         color = (255, 0, 0)  
 
@@ -102,15 +110,15 @@ class VideoControler:
         return cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
 
     def trim_video(self):
-        
+        filename = os.path.basename(self.filepath) 
         output_folder = 'E:/Programowanie/TrimmedVideos'
-        output_file = 'trimmedvideo.mp4'
+        output_file = os.path.join(output_folder, f"trimmed_{filename}") 
 
         
-
+        print()
         
 
-        cap_trim = cv2.VideoCapture("E:/Programowanie/MOV2024.mp4")
+        cap_trim = cv2.VideoCapture(self.filepath)
         
 
         cap_trim.set(cv2.CAP_PROP_POS_MSEC, self.trim_start_value * 1000)
@@ -132,19 +140,25 @@ class VideoControler:
 
         trim_range = self.trim_stop_value - self.trim_start_value
         while curr_time < self.trim_stop_value:
+ 
+            
+            if self.running == False:
+                break
+
 
             ret, frame = cap_trim.read()
 
             if ret:
 
 
-
-                if curr_time > self.subtitles.text_times[text_time_start][0]:
+                try:
+                    if curr_time > self.subtitles.text_times[text_time_start][0]:
             
-                    frame = self.put_text_on_image(frame,self.subtitles.text[text_time_start]['text'])
-                    if curr_time > self.subtitles.text_times[text_time_start][1]:
-                        text_time_start += 1
-            
+                        frame = self.put_text_on_image(frame,self.subtitles.text[text_time_start]['text'])
+                        if curr_time > self.subtitles.text_times[text_time_start][1]:
+                            text_time_start += 1
+                except:
+                    print("Error catching subtitles")
 
                 result_video.write(frame)
 
@@ -159,14 +173,14 @@ class VideoControler:
         result_video.release()
         cap_trim.release()
         
-        audio = mp.AudioFileClip("E:/Programowanie/MOV2024.mp4").subclipped(self.trim_start_value,self.trim_stop_value)
+        audio = mp.AudioFileClip(self.filepath).subclipped(self.trim_start_value,self.trim_stop_value)
         video = mp.VideoFileClip(os.path.join(output_folder, output_file))
-        output_file = 'trimmed_with_audio.mp4'
+        # output_file = os.path.join("trimmed_", filename)
         mp_audio = mp.CompositeAudioClip([audio])
         video.audio = mp_audio
         
 
-        video.write_videofile(os.path.join(output_folder, output_file))
+        video.write_videofile(os.path.join(output_folder, f"trimmed_with_audio{filename}"))
 
         self.socketio.emit("progress_update",{"progress" : 'Done'})
 
@@ -199,13 +213,14 @@ class VideoControler:
                 self.play = False
                 continue
        
-
-            if curr_time/1000 > self.subtitles.text_times[self.subtitles.time_idx][0]:
+            try:
+                if curr_time/1000 > self.subtitles.text_times[self.subtitles.time_idx][0]:
             
-                frame = self.put_text_on_image(frame,self.subtitles.text[self.subtitles.time_idx]['text'])
-                if curr_time/1000 > self.subtitles.text_times[self.subtitles.time_idx][1]:
-                    self.subtitles.time_idx += 1
-
+                    frame = self.put_text_on_image(frame,self.subtitles.text[self.subtitles.time_idx]['text'])
+                    if curr_time/1000 > self.subtitles.text_times[self.subtitles.time_idx][1]:
+                        self.subtitles.time_idx += 1
+            except:
+                print("Error catching subtitles")
 
             # Encode the frame as JPEG
             _, buffer = cv2.imencode('.jpg', frame)
@@ -219,5 +234,14 @@ class VideoControler:
             eventlet.sleep(1 / (self.fps * 1.5) - (time.time()-starttime))
             
             starttime=time.time()
+        self.cap.set(cv2.CAP_PROP_POS_MSEC, 0)
+
+        self.handle_start_stop(False)
+
+        # self.cap.release()
+
+    def stop_thread(self):
+        self._stop_event.set()
+        
 
         self.cap.release()

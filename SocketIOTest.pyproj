@@ -34,6 +34,7 @@
     <Compile Include="SocketIOTest\SubtitlesClass.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="SocketIOTest\TrascriptionWhisper\TranscriptionControllerClass.py" />
     <Compile Include="SocketIOTest\VideoControlerClass.py">
       <SubType>Code</SubType>
     </Compile>
@@ -42,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="SocketIOTest\" />
+    <Folder Include="SocketIOTest\TrascriptionWhisper\" />
     <Folder Include="SocketIOTest\static\" />
     <Folder Include="SocketIOTest\static\css\" />
     <Folder Include="SocketIOTest\static\fonts\" />
