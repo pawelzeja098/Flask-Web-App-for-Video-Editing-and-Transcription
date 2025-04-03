@@ -10,6 +10,7 @@ import eventlet
 import base64
 import time
 import tempfile
+import textwrap
 
 class VideoControler:
 
@@ -97,21 +98,34 @@ class VideoControler:
 
         # return img
 
+        max_width = img.shape[1]
+        font_size = 40
+
         font_path="arial.ttf"
         img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))  
         draw = ImageDraw.Draw(img_pil)
 
-        font = ImageFont.truetype(font_path, 50)  
+        font = ImageFont.truetype(font_path, font_size)  
         position = (50, img.shape[0] - 50)  
         color = (255, 0, 0)  
 
-        draw.text(position, text, font=font, fill=color)  
+
+        y_offset = 0
+        
+        lines = textwrap.wrap(text, width=max_width // font_size * 2)
+
+        for line in lines:
+            draw.text((position[0], position[1] + y_offset), line, font=font, fill=color)
+            y_offset += font_size + 5
+
+        # draw.text(position, text, font=font, fill=color)  
 
         return cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
 
     def trim_video(self):
         filename = os.path.basename(self.filepath) 
-        output_folder = 'E:/Programowanie/TrimmedVideos'
+        # output_folder = 'E:/Programowanie/TrimmedVideos'
+        output_folder = 'E:/Programowanie/VideosVoice'
         output_file = os.path.join(output_folder, f"trimmed_{filename}") 
 
         
@@ -179,8 +193,13 @@ class VideoControler:
         mp_audio = mp.CompositeAudioClip([audio])
         video.audio = mp_audio
         
-
+        
         video.write_videofile(os.path.join(output_folder, f"trimmed_with_audio{filename}"))
+        
+        video.reader.close()
+        
+
+        os.remove(output_file)
 
         self.socketio.emit("progress_update",{"progress" : 'Done'})
 
@@ -240,8 +259,8 @@ class VideoControler:
 
         # self.cap.release()
 
-    def stop_thread(self):
-        self._stop_event.set()
+    # def stop_thread(self):
+    #     self._stop_event.set()
         
 
-        self.cap.release()
+    #     self.cap.release()
