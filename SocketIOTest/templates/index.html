@@ -108,7 +108,7 @@
         var slider = document.getElementById('slider');
         var range = document.getElementById('range');
         noUiSlider.create(slider, {
-            start: [20, 80],
+            start: [0, 2],
             connect: true,
             tooltips: true,
             pips: {
@@ -150,7 +150,23 @@
         console.log("Max time set to:", maxTime);
         const button = document.getElementById('cut_button');
         button.style.display = 'inline';
-        cut_slider(maxTime);
+
+        const slider = document.getElementById('slider');
+
+        if (slider.noUiSlider) {
+            
+            slider.noUiSlider.updateOptions({
+                range: {
+                    'min': 0,
+                    'max': maxTime
+                }
+            });
+        }
+        else {
+            cut_slider(maxTime);
+        }
+        
+
     });
     socket.on('curr_film_time', (data) => {
         const curr_time = data.curr_time;

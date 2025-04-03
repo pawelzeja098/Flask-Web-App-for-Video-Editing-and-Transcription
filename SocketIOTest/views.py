@@ -103,26 +103,11 @@ def init_routes(app,socketio):
 
         video_path = os.path.join(GD.folder_path,filepath)
 
-        # if GD.th is not None:
-        #     if GD.th.name != video_path:
-        #         GD.th.stop_thread()
-
-        #         GD.th = VideoControler(video_path,GD.socketio)
-
-        #         GD.th.handle_start_stop(play=True)
-        #     else:
-            
-        #         GD.th.handle_start_stop(play=True)
-        #         GD.th.running = True
-
-
-        # else:
         
-
-        #     GD.th = VideoControler(video_path,GD.socketio)
-
-        #     GD.th.handle_start_stop(play=True)
         if GD.th is not None:
+            if GD.th.name == video_path:
+                GD.th.handle_start_stop(True)
+                return
             GD.th.handle_start_stop(False)
             GD.th.running = False
 
@@ -150,7 +135,7 @@ def init_routes(app,socketio):
             
             time = int(data["time"])
             GD.th.CurrentTime=time  #  cap.set(cv2.CAP_PROP_POS_MSEC, time * 1000)
-
+            GD.th.subtitles.search_for_sub_idx(time)
             GD.th.socketio.emit("status", {"message": f"Rewinding video to {time}s"})
         # app.video_controller.subtitles.search_for_sub_idx(time)
     
