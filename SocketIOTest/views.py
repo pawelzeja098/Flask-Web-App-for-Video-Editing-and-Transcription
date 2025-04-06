@@ -24,6 +24,8 @@ def init_routes(app,socketio):
 
     GD.socketio = socketio
 
+
+
     @app.route('/video_catalogue')
     def video_catalogue():
         """Renders the video catalogue page"""
@@ -44,6 +46,16 @@ def init_routes(app,socketio):
             year=datetime.now().year,
             files = files
         )
+
+    @app.route('/file-upload',methods=["POST"])
+    def file_upload():
+        files = []
+        for i in range(len(request.files)):
+
+            files.append(request.files.getlist(f'file[{i}]'))
+            
+
+        a = 0
 
     @app.route("/viewer")
     def viewer():

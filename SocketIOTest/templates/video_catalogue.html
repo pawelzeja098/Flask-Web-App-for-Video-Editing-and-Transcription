@@ -13,14 +13,22 @@
 <div class="card">
     <input class="form-check-input me-1" type="checkbox" value="Tylko bez transkrycji" aria-label="...">
     <div class="card-body">
+
+        <form action="/file-upload"
+              class="dropzone rounded-3"
+              enctype="multipart/form-data"
+              id="myDropzone"></form>   
+        
+
+
         <ul class="list-group">
             {% for file in files %}
 
             <li class="list-group-item">
                 <input class="form-check-input me-1" type="checkbox" value="" aria-label="...">
                 {{ file.video }}
-                
-                <a onclick="start_transcription('{{ file.video }}')"  class="btn btn-primary">Transcript Video</a>
+
+                <a onclick="start_transcription('{{ file.video }}')" class="btn btn-primary">Transcript Video</a>
 
                 {% if file.txt_csv %}
 
@@ -50,12 +58,23 @@
         //document.getElementById
         console.log("Command:", command);
         socket.emit(command);
-        
+
     }
 
     function start_transcription(videoFile) {
         socket.emit('start_transcription', { VideoFile: videoFile });
     }
+
+    
+  // Note that the name "myDropzone" is the camelized
+        // id of the form.
+    Dropzone.options.myDropzone = {
+        uploadMultiple: true,
+        maxFilesize: 1024,
+        paramName: "file",
+
+            // Configuration options go here
+        };
 
 </script>
 
